@@ -168,14 +168,14 @@ function atualizarOpcoesDisponiveis() {
 }
 
 async function cadastrarPlayer() {
-    const nome = document.getElementById('novoPlayerNome').value;
+    const nome = document.getElementById('admNovoPlayerNome').value;
     if(!nome.trim()) return alert("Nome inválido");
     await fetch('/players', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id: Date.now(), nome, kills: 0, deaths: 0, wins: 0, losses: 0 })
     });
-    document.getElementById('novoPlayerNome').value = "";
+    document.getElementById('admNovoPlayerNome').value = "";
     carregarPlayers();
 }
 
