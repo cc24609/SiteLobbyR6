@@ -41,7 +41,7 @@ app.post('/login', (req, res) => {
     }
 });
 
-// --- SEU FRONT-END CHAMA ESSA ROTA LOGO AO ENTRAR NO SITE ---
+// --- ROTAS DE JOGADORES (PLAYERS) ---
 app.get('/players', async (req, res) => {
     try {
         // Se as coleções não existirem ou o banco não conectou, vai disparar o Erro 500 aqui
@@ -51,34 +51,6 @@ app.get('/players', async (req, res) => {
         console.error("❌ ERRO 500 NA ROTA /players:", e.message);
         res.status(500).json({ error: "Erro interno no servidor ao buscar jogadores.", detalhes: e.message }); 
     }
-});
-
-app.get('/matches', async (req, res) => {
-    try {
-        const matches = await dbMatches.find({}).toArray();
-        res.json(matches);
-    } catch (e) { 
-        console.error("❌ ERRO 500 NA ROTA /matches:", e.message);
-        res.status(500).json({ error: "Erro interno no servidor ao buscar partidas.", detalhes: e.message }); 
-    }
-});
-
-app.get('/config', async (req, res) => {
-    try {
-        const config = await dbConfig.findOne({ tipo: 'lobby' });
-        res.json(config || { nomeLobby: "Lobby R6" });
-    } catch (e) { 
-        console.error("❌ ERRO 500 NA ROTA /config:", e.message);
-        res.status(500).json({ error: "Erro interno no servidor ao buscar config.", detalhes: e.message });
-    }
-});
-
-// --- ROTAS DE JOGADORES (PLAYERS) ---
-app.get('/players', async (req, res) => {
-    try {
-        const players = await dbPlayers.find({}).toArray();
-        res.json(players);
-    } catch (e) { res.json([]); }
 });
 
 app.post('/players', async (req, res) => {
@@ -169,7 +141,10 @@ app.get('/config', async (req, res) => {
     try {
         const config = await dbConfig.findOne({ tipo: 'lobby' });
         res.json(config || { nomeLobby: "Lobby R6" });
-    } catch (e) { res.json({ nomeLobby: "Lobby R6" }); }
+    } catch (e) { 
+        console.error("❌ ERRO 500 NA ROTA /config:", e.message);
+        res.status(500).json({ error: "Erro interno no servidor ao buscar config.", detalhes: e.message });
+    }
 });
 
 app.post('/config', async (req, res) => {
