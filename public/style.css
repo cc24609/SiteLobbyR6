@@ -1,0 +1,493 @@
+/* --- CONFIGURAÇÕES GERAIS --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+body {
+    background: #0b0d11;
+    color: #f5f6f7;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* --- HEADER RESPONSIVO (VIRA SCROLL NO CELULAR) --- */
+header {
+    background: #11151d;
+    padding: 15px 20px;
+    border-bottom: 3px solid #ffaa00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.logo-area h1 {
+    font-size: 22px;
+    color: #ffaa00;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+.nav-tabs {
+    display: flex;
+    width: 100%;
+    overflow-x: auto; /* Permite deslizar os botões para o lado no celular */
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    padding-bottom: 5px;
+    scrollbar-width: none; /* Oculta barra no Firefox */
+}
+.nav-tabs::-webkit-scrollbar {
+    display: none; /* Oculta barra no Chrome/Safari */
+}
+.nav-tabs button {
+    background: transparent;
+    color: #b7c1d1;
+    border: none;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0; /* Impede que o botão encolha e quebre o texto */
+    border-bottom: 3px solid transparent;
+}
+.nav-tabs button:hover, .nav-tabs button.active {
+    color: #ffaa00;
+    border-bottom-color: #ffaa00;
+}
+.admin-badge {
+    background: #e63946;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+/* --- LAYOUT DO CONTEÚDO --- */
+.container {
+    max-width: 1100px;
+    margin: 15px auto;
+    padding: 0 15px;
+}
+.view-section {
+    display: none;
+}
+.view-section.active {
+    display: block;
+}
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* Padrão de 1 coluna para celular */
+    gap: 20px;
+}
+.card-box {
+    background: #161b26;
+    padding: 18px;
+    border-radius: 8px;
+    border-left: 4px solid #3b4659;
+    margin-bottom: 15px;
+}
+.card-box h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #2d384c;
+    padding-bottom: 8px;
+    color: #ffaa00;
+}
+
+/* --- CORES DO KD CONDICIONAL --- */
+.kd-high { 
+    color: #2bff6a !important; 
+    font-weight: bold; 
+}
+.kd-low { 
+    color: #ff3b3b !important; 
+    font-weight: bold; 
+}
+.kd-normal { 
+    color: #f5f6f7; 
+}
+
+/* --- FORMULÁRIOS ADAPTÁVEIS --- */
+input, select {
+    width: 100%;
+    padding: 12px;
+    background: #222938;
+    border: 1px solid #3b4659;
+    color: white;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    outline: none;
+}
+input:focus, select:focus {
+    border-color: #ffaa00;
+}
+button.btn-primary {
+    background: #ffaa00;
+    color: #11141a;
+    font-weight: bold;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+button.btn-primary:hover {
+    background: #e09600;
+}
+button.btn-danger {
+    background: #ff3b3b;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* --- ADAPTAÇÃO DA TABELA DE RANKING (SCROLL HORIZONTAL PREVENTIVO) --- */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Garante que a tabela não quebre a tela do celular */
+    -webkit-overflow-scrolling: touch;
+}
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Mantém espaçamento interno mínimo para não esmagar os dados */
+}
+.ranking-table th, .ranking-table td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #2d384c;
+    font-size: 14px;
+}
+.ranking-table th {
+    background: #1f2636;
+    color: #ffaa00;
+}
+.ranking-table tr:hover {
+    background: #212836;
+}
+
+/* --- LISTAGEM DE PARTIDAS (VISÃO GERAL DO HISTÓRICO) --- */
+.match-summary-card {
+    background: #161b26;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #ffaa00;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+.match-summary-card:hover {
+    background: #1d2433;
+    transform: translateX(3px);
+}
+.match-summary-info span {
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+/* --- CRIADOR DE PARTIDA 5X5 / FORMULÁRIO DE EDIÇÃO --- */
+.creator-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+.team-box-creator {
+    padding: 15px;
+    border-radius: 6px;
+    background: #11141c;
+}
+.player-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+    background: #1a212e;
+    padding: 6px;
+    border-radius: 4px;
+}
+.player-row select {
+    margin-bottom: 0;
+    flex: 2;
+    padding: 6px;
+    font-size: 13px;
+}
+.player-row input {
+    margin-bottom: 0;
+    flex: 1;
+    padding: 6px;
+    font-size: 13px;
+    text-align: center;
+}
+.lobby-config-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* --- TELA LIMPA / MODAL DE DETALHES DA PARTIDA (ESTILO SCOREBOARD R6) --- */
+.r6-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 12, 18, 0.96);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 10px;
+}
+.r6-modal-content {
+    max-width: 1000px;
+    margin: 20px auto;
+    background: #11141c;
+    border: 2px solid #323b4d;
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+}
+.r6-modal-header {
+    background: linear-gradient(90deg, #1f2736, #11141c);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 2px solid #ffaa00;
+}
+.r6-map-title {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #fff;
+    letter-spacing: 2px;
+}
+.r6-score-banner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #1a2230;
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: 1px solid #2d384c;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.r6-team-name-input-display {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.r6-score-number {
+    font-size: 26px;
+    font-weight: 900;
+    color: #ffaa00;
+}
+
+/* Tabela Interna do Placar */
+.r6-scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.r6-scoreboard-table th {
+    background: #161b26;
+    color: #9aa8bd;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 10px 15px;
+    text-align: left;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #2d384c;
+}
+.r6-scoreboard-table td {
+    padding: 12px 15px;
+    font-size: 14px;
+    border-bottom: 1px solid #1c2330;
+}
+.r6-scoreboard-container {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 coluna no celular */
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Divisores Visuais de Time no Placar */
+.r6-row-blue {
+    background: rgba(43, 108, 255, 0.04);
+    border-left: 5px solid #2b6cff;
+}
+.r6-row-orange {
+    background: rgba(255, 145, 56, 0.04);
+    border-left: 5px solid #ff9138;
+}
+.r6-row-blue:hover { background: rgba(43, 108, 255, 0.10); }
+.r6-row-orange:hover { background: rgba(255, 145, 56, 0.10); }
+
+
+/* --- SESSÃO DO PAINEL ADMINISTRATIVO (ACESSO ADM) --- */
+
+/* Força os elementos da aba de autenticação a manterem o alinhamento central */
+#tab-login .login-box,
+#tab-login #logoutContainer {
+    width: 100%;
+    max-width: 400px;
+    margin: 40px auto; /* Afasta um pouco do header e centraliza perfeitamente */
+}
+
+/* Estilização da caixa de Login quando DESLOGADO */
+#tab-login .login-box {
+    background: #11151d;
+    border: 1px solid #1f2636;
+    border-left: 4px solid #ffaa00; /* Borda amarela característica do R6 */
+    padding: 25px;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Título dentro da caixa de login */
+#tab-login .login-box h2 {
+    font-size: 20px;
+    color: #ffaa00;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1f2636;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Contêiner que envolve e empilha verticalmente os dois cartões independentes (Logado) */
+#logoutContainer {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Estilização individual de cada Bloco (Card) dentro do ADM quando LOGADO */
+#logoutContainer .card-box {
+    background: #11151d;
+    border: 1px solid #1f2636;
+    padding: 25px;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    width: 100%;
+}
+
+/* Garante que o botão do olho não sofra distorções de tamanho ou herança indesejada */
+#btnAlternarSenha:hover {
+    background: transparent !important;
+    opacity: 0.8;
+}
+#btnAlternarSenha:active {
+    transform: translateY(-50%) scale(0.9) !important;
+}
+
+/* Títulos internos dos blocos do ADM */
+#logoutContainer .card-box h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Customização dos botões internos para esticarem em 100% da largura */
+#logoutContainer .card-box button {
+    width: 100%;
+    margin-top: 5px;
+}
+
+/* Texto descritivo da sessão ativa */
+#logoutContainer .card-box p {
+    font-size: 14px;
+    color: #b7c1d1;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+/* Estilização específica do botão de Entrar (Acesso ADM deslogado) */
+#tab-login .login-box button {
+    background: #ffaa00; /* Dourado padrão R6 */
+    color: #0b0d11;      /* Texto escuro para dar contraste */
+    font-weight: bold;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+}
+
+/* Efeito ao passar o rato (Hover) */
+#tab-login .login-box button:hover {
+    background: #e09600; /* Dourado um pouco mais escuro */
+}
+
+/* Efeito ao clicar (Active) */
+#tab-login .login-box button:active {
+    transform: scale(0.98); /* Leve feedback de clique */
+}
+
+
+/* --- CONFIGURAÇÃO PARA TELAS MAIORES (TABLETS E PCS) --- */
+@media (min-width: 768px) {
+    header {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 30px;
+    }
+    .logo-area h1 {
+        text-align: left;
+    }
+    .nav-tabs {
+        width: auto;
+        overflow-x: visible;
+    }
+    .grid-layout {
+        grid-template-columns: 2fr 1fr;
+    }
+    .creator-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .lobby-config-input {
+        flex-direction: row;
+    }
+    .r6-modal-header {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 20px 30px;
+    }
+    .r6-map-title {
+        font-size: 26px;
+    }
+    .r6-score-banner {
+        padding: 10px 30px;
+    }
+    .r6-team-name-input-display {
+        font-size: 18px;
+    }
+    .r6-score-number {
+        font-size: 32px;
+    }
+    .r6-modal {
+        padding: 20px;
+    }
+    .r6-scoreboard-container {
+        grid-template-columns: 1fr 1fr; /* 2 colunas no PC (Lado a Lado) */
+    }
+}

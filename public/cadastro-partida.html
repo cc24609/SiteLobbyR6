@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Computar Partida</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container" style="flex-direction: column; max-width: 600px; margin: 0 auto;">
+        <h2>Registrar Resultados do Lobby</h2>
+        <div id="listaEstatisticas"></div>
+        <button onclick="enviarPartida()" style="background: #2bff6a; color: #111; font-weight: bold; width: 100%; font-size: 16px;">Salvar Partida</button>
+        <button onclick="location.href='index.html'" style="background: #444; width: 100%; margin-top: 10px;">Cancelar</button>
+    </div>
+
+    <script>
+        if(localStorage.getItem("admin") !== "true") {
+            alert("Acesso negado!");
+            window.location.href = "index.html";
+        }
+
+        async function carregarFormulario() {
+            const response = await fetch("/players");
+            const players = await response.json();
+            const container = document.getElementById("listaEstatisticas");
+            
+            if(players.length === 0) {
+                container.innerHTML = "<p>Nenhum jogador cadastrado para pontuar.</p>";
+                return;
+            }
+
+            players.forEach(p => {
+                container.innerHTML += `
+                    <div class="card" data-id="${p.id}" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; min-width: 120px;">${p.nome}</span>
+                        <div>
+                            Kills: <input type="number" class="p-kills" value="0" style="width: 60px; display: inline-block; margin: 0 5px;">
+                            Deaths: <input type="number" class="p-deaths" value="0" style="width: 60px; display: inline-block; margin: 0 5px;">
+                            Vitória: <input type="checkbox" class="p-win" style="width: auto; margin-left: 5px;">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function enviarPartida() {
+            const cards = document.querySelectorAll("#listaEstatisticas .card");
+            const playerStats = [];
+
+            cards.forEach(card => {
+                const id = card.getAttribute("data-id");
+                const kills = parseInt(card.querySelector(".p-kills").value) || 0;
+                const deaths = parseInt(card.querySelector(".p-deaths").value) || 0;
+                const win = card.querySelector(".p-win").checked;
+
+                // Só envia os dados dos jogadores que de fato participaram (tiveram kills, deaths ou vitória)
+                if (kills > 0 || deaths > 0 || win) {
+                    playerStats.push({ id, kills, deaths, win });
+                }
+            });
+
+            if(playerStats.length === 0) {
+                return alert("Nenhum dado de partida foi preenchido.");
+            }
+
+            const response = await fetch("/matches", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ playerStats })
+            });
+
+            if(response.ok) {
+                alert("Partida computada e estatísticas atualizadas!");
+                window.location.href = "index.html";
+            }
+        }
+
+        window.onload = carregarFormulario;
+    </script>
+</body>
+</html>

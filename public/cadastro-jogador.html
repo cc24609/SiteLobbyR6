@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Jogador</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container" style="justify-content: center; margin-top: 50px;">
+        <div class="login-box" style="max-width: 400px;">
+            <h2>Novo Jogador</h2>
+            <input id="nome" placeholder="Nome do Jogador">
+            <button onclick="salvar()" style="width: 100%; margin-bottom: 10px;">Salvar Jogador</button>
+            <button onclick="location.href='index.html'" style="background: #444; width: 100%;">Voltar</button>
+        </div>
+    </div>
+
+    <script>
+        // Segurança Básica na Interface
+        if(localStorage.getItem("admin") !== "true") {
+            alert("Acesso negado!");
+            window.location.href = "index.html";
+        }
+
+        async function salvar(){
+            const nomeInput = document.getElementById('nome').value;
+            if(!nomeInput.trim()) return alert("Insira um nome válido");
+
+            await fetch('/players', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: Date.now(),
+                    nome: nomeInput,
+                    kills: 0,
+                    deaths: 0,
+                    wins: 0
+                })
+            });
+            alert('Jogador cadastrado!');
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

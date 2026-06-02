@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby R6 - Campeonato</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1 id="nomeLobbyPrincipal">Lobby R6</h1>
+        </div>
+
+        <div class="nav-tabs">
+            <button id="tab-mvp-btn" class="active" onclick="switchTab('mvp')">Leaderboard / MVPs</button>
+            <button id="tab-partidas-btn" onclick="switchTab('partidas')">Últimas Partidas</button>
+            <button id="tab-login-btn" onclick="switchTab('login')">Acesso ADM</button>
+            <button id="tab-adm-players-btn" style="display:none;" onclick="switchTab('adm-players')">Gerenciar Players <span class="admin-badge">ADM</span></button>
+            <button id="tab-adm-partidas-btn" style="display:none;" onclick="switchTab('adm-partidas')">Gerenciar Partidas <span class="admin-badge">ADM</span></button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section id="tab-mvp" class="view-section active">
+            <div class="card-box">
+                <h2>Classificação Geral do Campeonato</h2>
+                <div class="table-wrapper">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Posição</th>
+                                <th>Jogador</th>
+                                <th>K/D Ratio</th>
+                                <th>Kills</th>
+                                <th>Deaths</th>
+                                <th>Vitórias</th>
+                                <th>Derrotas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-partidas" class="view-section">
+            <div class="card-box">
+                <h2>Histórico de Confrontos</h2>
+                <div id="listaPartidasPublica"></div>
+            </div>
+        </section>
+
+        <section id="tab-login" class="view-section">
+            <div style="max-width: 400px; margin: 40px auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
+                
+                <div id="loginFormContainer" class="login-box" style="width: 100%; margin: 0;">
+                    <h2>Login ADM</h2>
+                    <input id="admUsuario" placeholder="Usuário">
+                    
+                    <div class="senha-container" style="position: relative; width: 100%;">
+                        <input id="admSenha" type="password" placeholder="Senha" style="padding-right: 45px; margin-bottom: 12px;">
+                        <button type="button" id="btnAlternarSenha" onclick="alternarVisibilidadeSenha()" style="position: absolute; right: 10px; top: 38%; transform: translateY(-50%); background: transparent; border: none; color: #b7c1d1; cursor: pointer; width: auto; padding: 5px; font-size: 16px; margin: 0;">
+                            👁️
+                        </button>
+                    </div>
+                    
+                    <button onclick="executarLogin()" style="width: 100%;">Entrar</button>
+                </div>
+
+                <div id="logoutContainer" style="display: none; width: 100%; flex-direction: column; gap: 20px;">
+                    
+                    <div class="card-box" style="margin: 0; border-left: 4px solid #ffaa00; background: #11151d; padding: 20px; border-radius: 6px; width: 100%;">
+                        <h2 style="font-size: 18px; color: #ffaa00; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #1f2636;">⚙️ Configurações</h2>
+                        <label style="font-size: 11px; color: #b7c1d1; display: block; margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px;">NOME DO LOBBY:</label>
+                        <input type="text" id="inputNomeLobby" placeholder="Ex: Campeonato R6 Corujão" style="margin-bottom: 15px; width: 100%;">
+                        <button class="btn-primary" onclick="salvarNomeLobby()" style="width: 100%; font-weight: bold;">Salvar Nome</button>
+                    </div>
+
+                    <div class="card-box" style="margin: 0; border-left: 4px solid #ff3b3b; background: #11151d; padding: 20px; border-radius: 6px; width: 100%;">
+                        <h2 style="font-size: 18px; color: #ff3b3b; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #1f2636;">👤 Sessão Administrativa</h2>
+                        <p style="font-size: 13px; color: #b7c1d1; margin-bottom: 15px;">Você está autenticado no painel de controle do servidor.</p>
+                        <button class="btn-danger" onclick="ejecutarLogout()" style="width: 100%; background: #261214; color: #ff3b3b; border: 1px solid #4a1c1e; font-weight: bold;">Sair do Painel</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section id="tab-adm-players" class="view-section">
+            <div class="card-box">
+                <h2>Gerenciamento de Jogadores Cadastrados</h2>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <input type="text" id="admNovoPlayerNome" placeholder="Nome do Novo Jogador" style="flex: 1; margin-bottom: 0; min-width: 200px;">
+                    <button class="btn-primary" onclick="admCadastrarJogador()" style="width: auto; padding: 0 25px;">+ Cadastrar</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Nome do Jogador</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admListaPlayersCorpo">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-adm-partidas" class="view-section">
+            <div class="card-box">
+                <h2 id="tituloFormPartida">Lançar Nova Partida (10 Players Obrigatórios)</h2>
+                <input type="hidden" id="editMatchId" value="">
+                
+                <input id="partidaMapa" placeholder="Nome do Mapa (Ex: Coastline, Oregon...)">
+
+                <div class="creator-grid">
+                    <div class="team-box-creator" style="border-top: 4px solid #2b6cff;">
+                        <input id="nomeTimeAzul" value="Time Azul" placeholder="Nome do Time Azul" style="font-weight:bold; color:#5289ff;">
+                        <div id="slotsTimeAzul"></div>
+                    </div>
+                    <div class="team-box-creator" style="border-top: 4px solid #ff9138;">
+                        <input id="nomeTimeLaranja" value="Time Laranja" placeholder="Nome do Time Laranja" style="font-weight:bold; color:#ff9138;">
+                        <div id="slotsTimeLaranja"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button id="btnSalvarPartida" class="btn-primary" style="background: #2bff6a; color: #111;" onclick="salvarPartida()">Salvar Partida</button>
+                    <button id="btnCancelarEdicao" class="btn-primary" style="background: #555; color: #fff; display:none;" onclick="cancelarEdicaoPartida()">Cancelar Edição</button>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h2>Painel de Gerenciamento das Partidas Gravadas</h2>
+                <div id="listaPartidasPainelDelecao"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modalR6" class="r6-modal" onclick="fecharModalR6(event)">
+        <div class="r6-modal-content">
+            <div class="r6-modal-header">
+                <div class="r6-map-title" id="m-mapa">COASTLINE</div>
+                <div class="r6-score-banner">
+                    <span class="r6-team-name-input-display" id="m-t1-nome" style="color: #5289ff;">TIME A</span>
+                    <span class="r6-score-number">V</span>
+                    <span style="color: #666;">vs</span>
+                    <span class="r6-score-number" style="color: #888;">D</span>
+                    <span class="r6-team-name-input-display" id="m-t2-nome" style="color: #ff9138;">TIME B</span>
+                </div>
+                <button class="btn-danger" style="background:#333;" onclick="document.getElementById('modalR6').style.display='none'">X</button>
+            </div>
+
+            <table class="r6-scoreboard-table">
+                <thead>
+                    <tr>
+                        <th>Jogador</th>
+                        <th>Resultado</th>
+                        <th>Kills (K)</th>
+                        <th>Deaths (D)</th>
+                    </tr>
+                </thead>
+                <tbody id="m-corpo-tabela"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

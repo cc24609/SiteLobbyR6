@@ -1,0 +1,126 @@
+[
+  {
+    "id": 104,
+    "nome": "Paluh_Fan",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 0,
+    "losses": null
+  },
+  {
+    "id": 105,
+    "nome": "Bullet_Time",
+    "kills": 50,
+    "deaths": 4,
+    "wins": 1,
+    "losses": 1
+  },
+  {
+    "id": 106,
+    "nome": "KDS_Sniper",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 1
+  },
+  {
+    "id": 107,
+    "nome": "Muzi_Peak",
+    "kills": 2,
+    "deaths": 2,
+    "wins": 0,
+    "losses": 1
+  },
+  {
+    "id": 108,
+    "nome": "Kamikaze",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 1
+  },
+  {
+    "id": 109,
+    "nome": "Psycho_Doc",
+    "kills": 2,
+    "deaths": 5,
+    "wins": 1,
+    "losses": 0
+  },
+  {
+    "id": 110,
+    "nome": "Pino_Aim",
+    "kills": 4,
+    "deaths": 5,
+    "wins": 1,
+    "losses": 0
+  },
+  {
+    "id": 111,
+    "nome": "Lagonis_Call",
+    "kills": 43,
+    "deaths": 6,
+    "wins": 2,
+    "losses": 0
+  },
+  {
+    "id": 112,
+    "nome": "Soulz_Clutch",
+    "kills": 2,
+    "deaths": 3,
+    "wins": 1,
+    "losses": 1
+  },
+  {
+    "id": 114,
+    "nome": "Lukid_Wall",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 0
+  },
+  {
+    "id": 115,
+    "nome": "Red_Gamer",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 0
+  },
+  {
+    "id": 116,
+    "nome": "Alem4o_Joy",
+    "kills": 30,
+    "deaths": 5,
+    "wins": 1,
+    "losses": 1
+  },
+  {
+    "id": 117,
+    "nome": "Levy_R6",
+    "kills": 0,
+    "deaths": 0,
+    "wins": 0,
+    "losses": 1
+  },
+  {
+    "id": 118,
+    "nome": "Kanto_Slayer",
+    "kills": 34,
+    "deaths": 4,
+    "wins": 1,
+    "losses": 1
+  },
+  {
+    "id": 119,
+    "nome": "S3xyCake",
+    "kills": 11,
+    "deaths": 3,
+    "wins": 0,
+    "losses": 1
+  },
+  {
+    "id": 120,
+    "nome": "Sanpo_R6",
+    "kills": 1,
+    "deaths": 0,
+    "wins": 0,
+    "losses": 2
+  }
+]
