@@ -13,7 +13,7 @@ if (!uri) {
     console.error("❌ ERRO CRÍTICO: A variável de ambiente MONGO_URI não foi definida no Render!");
 }
 
-const client = new MongoClient(uri || "mongodb://localhost:27017/lobbyR6");
+const client = new MongoClient(uri || "mongodb://localhost:27017/lobbyr6");
 let db, dbPlayers, dbMatches, dbConfig;
 
 // Conexão assíncrona robusta com o MongoDB Atlas
@@ -25,7 +25,7 @@ async function conectarBanco() {
         dbPlayers = db.collection('players');
         dbMatches = db.collection('matches');
         dbConfig = db.collection('config');
-        console.log("🔥 Conectado com sucesso ao MongoDB Atlas (lobbyR6)!");
+        console.log("🔥 Conectado com sucesso ao MongoDB Atlas (lobbyr6)!");
     } catch (err) {
         console.error("❌ ERRO CRÍTICO AO CONECTAR COM O MONGO:", err.message);
     }
@@ -67,7 +67,6 @@ app.post('/players', async (req, res) => {
     try {
         const dadosPlayer = req.body;
 
-        // Higienização tática: Garante que os números entram como Int e não como texto puro
         const novoPlayer = {
             id: Number(dadosPlayer.id) || Date.now(),
             nome: dadosPlayer.nome,
@@ -109,11 +108,11 @@ app.get('/matches', async (req, res) => {
     }
 });
 
+// Criar nova Partida (POST)
 app.post('/matches', async (req, res) => {
     try {
         const novaPartida = req.body;
         
-        // Garante um ID numérico para a partida antes de salvar
         novaPartida.id = Number(novaPartida.id) || Date.now();
         await dbMatches.insertOne(novaPartida);
 
@@ -135,26 +134,95 @@ app.post('/matches', async (req, res) => {
             }
         };
 
-        // Aplica os pontos da partida (multiplicador 1)
         await ajustarStatsPlayers(novaPartida.timeAzul, 1);
         await ajustarStatsPlayers(novaPartida.timeLaranja, 1);
 
-        console.log(`📊 Partida ID ${novaPartida.id} registada e K/D recalculado!`);
+        console.log(`📊 Partida ID ${novaPartida.id} registrada e K/D recalculado!`);
         res.json({ ok: true });
     } catch (e) { 
         console.error("❌ Erro no POST /matches:", e.message);
-        res.status(500).json({ error: "Erro ao registar partida", detalhes: e.message }); 
+        res.status(500).json({ error: "Erro ao registrar partida", detalhes: e.message }); 
     }
 });
 
+// 🔥 NOVA ROTA: Editar Partida Gravada (PUT) - Trata buscas por ID numérico ou String
+app.put('/matches/:id', async (req, res) => {
+    try {
+        const idParam = req.params.id;
+        const dadosNovos = req.body;
+
+        // 1. Localiza a partida antiga antes de aplicar as mudanças (necessário para reverter K/D antigo)
+        let partidaAntiga = await dbMatches.findOne({ id: Number(idParam) });
+        let matchIdQuery = Number(idParam);
+
+        if (!partidaAntiga) {
+            partidaAntiga = await dbMatches.findOne({ id: String(idParam) });
+            matchIdQuery = String(idParam);
+        }
+
+        if (!partidaAntiga) {
+            return res.status(404).json({ error: "Partida não encontrada para edição." });
+        }
+
+        // 2. Função auxiliar para alterar o K/D de forma incremental
+        const alterarStats = async (time, multiplicador) => {
+            const statusVitoria = time.resultado === 'vitoria';
+            for (const p of time.players) {
+                await dbPlayers.updateOne(
+                    { id: Number(p.id) },
+                    {
+                        $inc: {
+                            kills: Number(p.kills) * multiplicador,
+                            deaths: Number(p.deaths) * multiplicador,
+                            wins: (statusVitoria ? 1 : 0) * multiplicador,
+                            losses: (!statusVitoria ? 1 : 0) * multiplicador
+                        }
+                    }
+                );
+            }
+        };
+
+        // 3. REVERTE os status antigos calculados por essa partida anteriormente (multiplicador -1)
+        if (partidaAntiga.timeAzul) await alterarStats(partidaAntiga.timeAzul, -1);
+        if (partidaAntiga.timeLaranja) await alterarStats(partidaAntiga.timeLaranja, -1);
+
+        // 4. Garante que o objeto atualizado mantém o ID correto e consistente
+        dadosNovos.id = matchIdQuery;
+
+        // 5. Substitui os dados da partida antiga pelos novos dados no MongoDB Atlas
+        await dbMatches.replaceOne({ id: matchIdQuery }, dadosNovos);
+
+        // 6. APLICA as novas pontuações higienizadas da partida atualizada (multiplicador 1)
+        await alterarStats(dadosNovos.timeAzul, 1);
+        await alterarStats(dadosNovos.timeLaranja, 1);
+
+        console.log(`🔄 Partida ID ${idParam} ATUALIZADA e K/D recalculado com sucesso!`);
+        res.json({ ok: true });
+
+    } catch (e) {
+        console.error("❌ Erro no PUT /matches:", e.message);
+        res.status(500).json({ error: "Erro ao atualizar partida", detalhes: e.message });
+    }
+});
+
+// Deletar Partida (DELETE) - Corrigido contra Erro 404 de tipo
 app.delete('/matches/:id', async (req, res) => {
     try {
-        const matchId = Number(req.params.id);
-        const partida = await dbMatches.findOne({ id: matchId });
+        const idParam = req.params.id;
         
-        if (!partida) return res.status(404).json({ error: "Partida não encontrada" });
+        let partida = await dbMatches.findOne({ id: Number(idParam) });
+        let matchIdQuery = Number(idParam);
 
-        // Função interna para reverter os status antigos dos jogadores antes de apagar a partida
+        if (!partida) {
+            partida = await dbMatches.findOne({ id: String(idParam) });
+            matchIdQuery = String(idParam);
+        }
+        
+        if (!partida) {
+            console.warn(`⚠️ Partida ID ${idParam} não encontrada para exclusão.`);
+            return res.status(404).json({ error: "Partida não encontrada no banco de dados." });
+        }
+
         const reverterStatsPlayers = async (time) => {
             const statusVitoria = time.resultado === 'vitoria';
             for (const p of time.players) {
@@ -172,11 +240,11 @@ app.delete('/matches/:id', async (req, res) => {
             }
         };
 
-        await reverterStatsPlayers(partida.timeAzul);
-        await reverterStatsPlayers(partida.timeLaranja);
+        if (partida.timeAzul) await reverterStatsPlayers(partida.timeAzul);
+        if (partida.timeLaranja) await reverterStatsPlayers(partida.timeLaranja);
         
-        await dbMatches.deleteOne({ id: matchId });
-        console.log(`🗑️ Partida ID ${matchId} eliminada e K/D revertido.`);
+        await dbMatches.deleteOne({ id: matchIdQuery });
+        console.log(`🗑️ Partida ID ${idParam} eliminada e K/D revertido.`);
         res.json({ ok: true });
     } catch (e) { 
         console.error("❌ Erro no DELETE /matches:", e.message);

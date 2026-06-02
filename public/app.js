@@ -229,9 +229,45 @@ function coletarTimeArray(containerId) {
         const id = row.querySelector('.p-id').value;
         const kills = parseInt(row.querySelector('.p-k').value) || 0;
         const deaths = parseInt(row.querySelector('.p-d').value) || 0;
-        if(id) arr.push({ id, kills, deaths });
+        
+        // 🔥 AJUSTE CRÍTICO: Garante que passamos o ID convertido para Número logo na coleta
+        if(id) arr.push({ id: Number(id), kills, deaths });
     });
     return arr;
+}
+
+function prepararEdicaoPartida(id) {
+    const match = listaGlobalMatches.find(m => m.id.toString() === id.toString());
+    if(!match) return;
+
+    document.getElementById('tituloFormPartida').innerText = `Editando Partida (ID: ${match.id})`;
+    document.getElementById('editMatchId').value = match.id;
+    document.getElementById('partidaMapa').value = match.mapa;
+    document.getElementById('nomeTimeAzul').value = match.timeAzul.nome;
+    document.getElementById('nomeTimeLaranja').value = match.timeLaranja.nome;
+    
+    document.getElementById('placarAzul').value = match.timeAzul.pontuacao !== undefined ? match.timeAzul.pontuacao : "7";
+    document.getElementById('placarLaranja').value = match.timeLaranja.pontuacao !== undefined ? match.timeLaranja.pontuacao : "5";
+    
+    document.getElementById('btnCancelarEdicao').style.display = "inline-block";
+
+    const preencherSlots = (containerId, playersArray) => {
+        const rows = document.querySelectorAll(`#${containerId} .player-row`);
+        rows.forEach((row, idx) => {
+            if(playersArray[idx]) {
+                // Compara e preenche convertendo o ID para String no seletor HTML
+                row.querySelector('.p-id').value = playersArray[idx].id.toString();
+                row.querySelector('.p-k').value = playersArray[idx].kills;
+                row.querySelector('.p-d').value = playersArray[idx].deaths;
+            }
+        });
+    };
+
+    preencherSlots('slotsTimeAzul', match.timeAzul.players);
+    preencherSlots('slotsTimeLaranja', match.timeLaranja.players);
+    
+    atualizarOpcoesDisponiveis();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function salvarPartida() {
@@ -287,40 +323,6 @@ async function salvarPartida() {
     await carregarPlayers();
     await carregarPartidas();
     switchTab('partidas');
-}
-
-function prepararEdicaoPartida(id) {
-    const match = listaGlobalMatches.find(m => m.id === id);
-    if(!match) return;
-
-    document.getElementById('tituloFormPartida').innerText = `Editando Partida (ID: ${match.id})`;
-    document.getElementById('editMatchId').value = match.id;
-    document.getElementById('partidaMapa').value = match.mapa;
-    document.getElementById('nomeTimeAzul').value = match.timeAzul.nome;
-    document.getElementById('nomeTimeLaranja').value = match.timeLaranja.nome;
-    
-    // Seta os seletores para os placares salvos anteriormente
-    document.getElementById('placarAzul').value = match.timeAzul.pontuacao !== undefined ? match.timeAzul.pontuacao : "7";
-    document.getElementById('placarLaranja').value = match.timeLaranja.pontuacao !== undefined ? match.timeLaranja.pontuacao : "5";
-    
-    document.getElementById('btnCancelarEdicao').style.display = "inline-block";
-
-    const preencherSlots = (containerId, playersArray) => {
-        const rows = document.querySelectorAll(`#${containerId} .player-row`);
-        rows.forEach((row, idx) => {
-            if(playersArray[idx]) {
-                row.querySelector('.p-id').value = playersArray[idx].id;
-                row.querySelector('.p-k').value = playersArray[idx].kills;
-                row.querySelector('.p-d').value = playersArray[idx].deaths;
-            }
-        });
-    };
-
-    preencherSlots('slotsTimeAzul', match.timeAzul.players);
-    preencherSlots('slotsTimeLaranja', match.timeLaranja.players);
-    
-    atualizarOpcoesDisponiveis();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function cancelarEdicaoPartida() {
