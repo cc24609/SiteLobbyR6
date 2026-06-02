@@ -6,10 +6,16 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Puxa a string de conexão configurada nas variáveis de ambiente do Render
+// Puxa a string do Render
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
 
+// PROTEÇÃO: Impede o servidor de crashar em silêncio se a URI estiver errada
+if (!uri) {
+    console.error("❌ ERRO CRÍTICO: A variável MONGO_URI não foi configurada no Render!");
+    process.exit(1); 
+}
+
+const client = new MongoClient(uri);
 let db, dbPlayers, dbMatches, dbConfig;
 
 // Conecta ao MongoDB Atlas
