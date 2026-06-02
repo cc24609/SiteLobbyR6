@@ -21,7 +21,7 @@ async function conectarBanco() {
     try {
         if (!uri) return;
         await client.connect();
-        db = client.db('lobbyR6'); 
+        db = client.db('lobbyr6'); 
         dbPlayers = db.collection('players');
         dbMatches = db.collection('matches');
         dbConfig = db.collection('config');
