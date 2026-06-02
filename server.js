@@ -8,17 +8,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const uri = process.env.MONGO_URI;
 
-// PROTEÇÃO INTERNA: Mostra se o Render realmente está enviando a variável
 if (!uri) {
-    console.error("❌ ERRO CRÍTICO: A variável de ambiente MONGO_URI está vazia ou indefinida no Render!");
+    console.error("❌ ERRO CRÍTICO: A variável MONGO_URI não foi encontrada no painel do Render!");
 }
 
 const client = new MongoClient(uri || "mongodb://localhost:27017/teste");
 let db, dbPlayers, dbMatches, dbConfig;
 
+// Função de conexão robusta
 async function conectarBanco() {
     try {
-        if (!uri) return;
+        if (!uri) throw new Error("MONGO_URI ausente nas variáveis de ambiente.");
+        
         await client.connect();
         db = client.db('lobbyR6'); 
         dbPlayers = db.collection('players');
@@ -26,12 +27,22 @@ async function conectarBanco() {
         dbConfig = db.collection('config');
         console.log("🔥 Conectado com sucesso ao MongoDB Atlas (lobbyR6)!");
     } catch (err) {
-        // Se o banco falhar, o log vai detalhar aqui o motivo real (senha, ssl, etc)
-        console.error("❌ ERRO DETALHADO DE CONEXÃO COM O MONGO:", err);
+        console.error("❌ ERRO CRÍTICO DE CONEXÃO COM O MONGO:", err.message);
     }
 }
 conectarBanco();
 
+// Middleware de checagem: Se o banco não conectou, avisa o erro 500 detalhado
+app.use((req, res, next) => {
+    if (!dbPlayers || !dbMatches || !dbConfig) {
+        return res.status(500).json({ 
+            error: "O servidor iniciou, mas a conexão com o MongoDB Atlas ainda não foi estabelecida ou falhou." 
+        });
+    }
+    next();
+});
+
+// --- ROTA DE LOGIN ---
 app.post('/login', (req, res) => {
     const { usuario, senha } = req.body;
     if (usuario === "adminR6" && senha === "adminR6") {
@@ -44,12 +55,10 @@ app.post('/login', (req, res) => {
 // --- ROTAS DE JOGADORES (PLAYERS) ---
 app.get('/players', async (req, res) => {
     try {
-        // Se as coleções não existirem ou o banco não conectou, vai disparar o Erro 500 aqui
         const players = await dbPlayers.find({}).toArray();
         res.json(players);
     } catch (e) { 
-        console.error("❌ ERRO 500 NA ROTA /players:", e.message);
-        res.status(500).json({ error: "Erro interno no servidor ao buscar jogadores.", detalhes: e.message }); 
+        res.status(500).json({ error: e.message }); 
     }
 });
 
@@ -74,7 +83,9 @@ app.get('/matches', async (req, res) => {
     try {
         const matches = await dbMatches.find({}).toArray();
         res.json(matches);
-    } catch (e) { res.json([]); }
+    } catch (e) { 
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 app.post('/matches', async (req, res) => {
@@ -82,7 +93,6 @@ app.post('/matches', async (req, res) => {
         const novaPartida = req.body;
         await dbMatches.insertOne(novaPartida);
 
-        // Atualiza as estatísticas acumuladas dos jogadores no banco de dados
         const atualizarStats = async (time, multiplicador) => {
             const statusVitoria = time.resultado === 'vitoria';
             for (const p of time.players) {
@@ -141,10 +151,7 @@ app.get('/config', async (req, res) => {
     try {
         const config = await dbConfig.findOne({ tipo: 'lobby' });
         res.json(config || { nomeLobby: "Lobby R6" });
-    } catch (e) { 
-        console.error("❌ ERRO 500 NA ROTA /config:", e.message);
-        res.status(500).json({ error: "Erro interno no servidor ao buscar config.", detalhes: e.message });
-    }
+    } catch (e) { res.json({ nomeLobby: "Lobby R6" }); }
 });
 
 app.post('/config', async (req, res) => {
@@ -158,14 +165,6 @@ app.post('/config', async (req, res) => {
         res.json({ success: true });
     } catch (e) { res.json({ success: false }); }
 });
-
-// --- PING REQUISIÇÃO EXTERNA (KEEP-ALIVE) ---
-const http = require('http');
-setInterval(() => {
-    if(process.env.RENDER_EXTERNAL_URL) {
-        http.get(`${process.env.RENDER_EXTERNAL_URL}/config`, () => {});
-    }
-}, 840000);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor ativo na porta ${PORT}`));
